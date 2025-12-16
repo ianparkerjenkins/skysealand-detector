@@ -10,7 +10,7 @@ from skysealand.dataset import load
 logger = logging.getLogger(__name__)
 
 
-def validate_image(image_path: pathlib.Path) -> tuple[int, int, str]:
+def _validate_image(image_path: pathlib.Path) -> tuple[int, int, str]:
     """
     Validates that the image at the given file path can be opened by pillow.
 
@@ -38,7 +38,7 @@ def validate_image(image_path: pathlib.Path) -> tuple[int, int, str]:
 _NUM_ANNOTATION_VALS = 5
 
 
-def validate_annotation(
+def _validate_annotation(
     ann_path: pathlib.Path,
     img_width: int,
     img_height: int,
@@ -85,16 +85,9 @@ def validate_annotation(
     return errors
 
 
-class ValidationErrorResults(TypedDict):
-    """A Json summary of potential validation errors."""
-
-    missing_annotation: list[str]
-    missing_image: list[str]
-    corrupt_images: list[dict[str, str]]
-    annotation_errors: dict[str, list[str]]
-
-
-def validate_split(split_dir: pathlib.Path, num_classes: int) -> ValidationErrorResults:
+def _validate_split(
+    split_dir: pathlib.Path, num_classes: int
+) -> tuple[list[str], list[str], list[dict[str, str]], dict[str, list[str]]]:
     """
     Run a validation check for every (image, label) pair in a given directory.
 
@@ -106,46 +99,53 @@ def validate_split(split_dir: pathlib.Path, num_classes: int) -> ValidationError
         num_classes: The expected number of object classes to find in the dataset.
 
     Returns:
-        A json-dict summart of any validation issues that were encountered with the given directory.
+        A tuple of the missing annotation, missing image, corrupt images,
+        and annotation errors that were encountered with the given directory.
     """
     images_dir = split_dir
     # Roboflow-style: ../images --> ../labels/images
     ann_dir = split_dir.parent / "labels"
 
-    results: ValidationErrorResults = {
-        "missing_annotation": [],
-        "missing_image": [],
-        "corrupt_images": [],
-        "annotation_errors": {},
-    }
-
+    missing_annotation = []
+    missing_image = []
+    corrupt_images = []
+    annotation_errors = {}
     for img_path in images_dir.glob("*.jpg"):
         ann_path = ann_dir / (img_path.stem + ".txt")
         if not ann_path.exists():
-            results["missing_annotation"].append(str(img_path))
+            missing_annotation.append(str(img_path))
             continue
 
-        w, h, err = validate_image(img_path)
+        w, h, err = _validate_image(img_path)
         if err != "":
-            results["corrupt_images"].append({"image": str(img_path), "error": err})
+            corrupt_images.append({"image": str(img_path), "error": err})
             continue
 
-        errors = validate_annotation(ann_path, w, h, num_classes)
+        errors = _validate_annotation(ann_path, w, h, num_classes)
         if errors:
-            results["annotation_errors"][str(ann_path)] = errors
+            annotation_errors[str(ann_path)] = errors
 
     for ann_path in ann_dir.glob("*.txt"):
         img_path = images_dir / (ann_path.stem + ".jpg")
         if not img_path.exists():
-            results["missing_image"].append(str(ann_path))
+            missing_image.append(str(ann_path))
 
-    return results
+    return missing_annotation, missing_image, corrupt_images, annotation_errors
+
+
+class ValidationErrorResults(TypedDict):
+    """A Json summary of potential validation errors."""
+
+    missing_annotation: list[str]
+    missing_image: list[str]
+    corrupt_images: list[dict[str, str]]
+    annotation_errors: dict[str, list[str]]
 
 
 class ValidationReport(TypedDict):
     train: ValidationErrorResults
     test: ValidationErrorResults
-    valid: ValidationErrorResults
+    val: ValidationErrorResults
 
 
 def validate_all_data(
@@ -168,18 +168,37 @@ def validate_all_data(
             If None is given, then no dump will occur.
     """
     dataset_spec = load.load_dataset_config(dataset_config_path)
-
-    splits = {
-        "train": dataset_spec["train"],
-        "val": dataset_spec["val"],
-        "test": dataset_spec["test"],
+    num_classes = dataset_spec["num_classes"]
+    full_report: ValidationReport = {
+        "train": {
+            "missing_annotation": [],
+            "missing_image": [],
+            "corrupt_images": [],
+            "annotation_errors": {},
+        },
+        "test": {
+            "missing_annotation": [],
+            "missing_image": [],
+            "corrupt_images": [],
+            "annotation_errors": {},
+        },
+        "val": {
+            "missing_annotation": [],
+            "missing_image": [],
+            "corrupt_images": [],
+            "annotation_errors": {},
+        },
     }
-    num_classes = dataset_spec["nc"]
-    full_report: ValidationReport = {}
-    for split_name, split_dir in splits.items():
+    for split_name in ("train", "test", "val"):
+        split_dir = dataset_spec[split_name]
         logger.info("Validating %s split at %s...", split_name, split_dir)
-        report = validate_split(split_dir, num_classes)
-        full_report[split_name] = report
+        missing_annotation, missing_image, corrupt_images, annotation_errors = _validate_split(
+            split_dir, num_classes
+        )
+        full_report[split_name]["missing_annotation"] = missing_annotation
+        full_report[split_name]["missing_image"] = missing_image
+        full_report[split_name]["corrupt_images"] = corrupt_images
+        full_report[split_name]["annotation_errors"] = annotation_errors
 
     if report_path is not None:
         with report_path.open("w") as f:
