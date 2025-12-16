@@ -13,12 +13,15 @@ Navigate into the repository
 cd skysealand-detector
 ```
 
+Install mamba (if not already installed)
+```
+conda install -c conda-forge mamba
+```
+
 Create the conda environment.
 ```
 mambda env create -f dev_environment.yml
 ```
-
-TODO: How to update?
 
 Activate the new environment.
 ```
