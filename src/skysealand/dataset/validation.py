@@ -1,28 +1,36 @@
-from pathlib import Path
-from PIL import Image
-import yaml
 import json
+import logging
+import pathlib
+
+import PIL
+import yaml
+
+logger = logging.getLogger(__name__)
 
 
 def validate_image(image_path):
     try:
-        with Image.open(image_path) as img:
+        with PIL.Image.open(image_path) as img:
             img.verify()
-        with Image.open(image_path) as img:
+        with PIL.Image.open(image_path) as img:
             width, height = img.size
         return True, width, height, None
     except Exception as e:
         return False, None, None, str(e)
 
 
+# Each annotation must have the corners of the box and the class.
+_NUM_ANNOTATION_VALS = 5
+
+
 def validate_annotation(ann_path, img_width, img_height, num_classes):
     errors = []
-    with open(ann_path) as f:
+    with ann_path.open() as f:
         lines = f.readlines()
 
     for i, line in enumerate(lines):
         parts = line.strip().split()
-        if len(parts) != 5:
+        if len(parts) != _NUM_ANNOTATION_VALS:
             errors.append(f"Line {i}: malformed")
             continue
 
@@ -45,13 +53,13 @@ def validate_annotation(ann_path, img_width, img_height, num_classes):
 def validate_split(split_dir, num_classes):
     images_dir = split_dir
     # Roboflow-style: ../images --> ../labels/images
-    ann_dir = split_dir.parent / "labels" / split_dir.name  
+    ann_dir = split_dir.parent / "labels" / split_dir.name
 
     results = {
         "missing_annotation": [],
         "missing_image": [],
         "corrupt_images": [],
-        "annotation_errors": {}
+        "annotation_errors": {},
     }
 
     for img_path in images_dir.glob("*.jpg"):
@@ -77,30 +85,25 @@ def validate_split(split_dir, num_classes):
     return results
 
 
-def main():
+def validate_all_data():
     # Load YAML
-    with open("data/data.yaml") as f:
+    with pathlib.Path("data/data.yaml").open() as f:
         cfg = yaml.safe_load(f)
 
     splits = {
-        "train": Path(cfg["train"]).resolve(),
-        "val": Path(cfg["val"]).resolve(),
-        "test": Path(cfg["test"]).resolve()
+        "train": pathlib.Path(cfg["train"]).resolve(),
+        "val": pathlib.Path(cfg["val"]).resolve(),
+        "test": pathlib.Path(cfg["test"]).resolve(),
     }
-    classes = cfg["names"]
     num_classes = cfg["nc"]
 
     full_report = {}
     for split_name, split_dir in splits.items():
-        print(f"Validating {split_name} split...")
+        logger.info("Validating %s split...", split_name)
         report = validate_split(split_dir, num_classes)
         full_report[split_name] = report
 
-    with open("data/validation_report.json", "w") as f:
+    with pathlib.Path("data/validation_report.json").open("w") as f:
         json.dump(full_report, f, indent=2)
 
-    print("Validation complete. Report saved to validation_report.json")
-
-
-if __name__ == "__main__":
-    main()
+    logger.info("Validation complete. Report saved to validation_report.json")

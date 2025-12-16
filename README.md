@@ -1,5 +1,6 @@
 # SkySeaLand Detector
 
+TODO: Pretty picture
 
 ## Developer Install
 
@@ -38,22 +39,24 @@ Launch VSCode.
 code .
 ```
 
-## Training the model
 
-### Dataset Download
+## Dataset Download
 
-TODO: Convert these to typer CLI commands
-
-Download the data
+To download the data, first ensure that you performed the [developer install](#developer-install), then run:
 ```
-python ./src/skysealand/dataset/download.py
+skysealand download
 ```
 
 Ensure that a `data` directory has been created in the root directory and that it is not empty.
 
-Validate that the data was downloaded correctly
+This also checks for any issues with the downloaded data. To confirm that everything was correctly downloaded, inspect the newly created `validation_report.json` in the downloaded data folder.
+
+
+## Training the model
+
+To train the baseline version of the model, first ensure that you performed the [developer install](#developer-install) and have [downloaded the dataset](#dataset-download), then run:
 ```
-python ./src/skysealand/dataset/validation.py
+skysealand train
 ```
 
-Then inspect the newly created `validation_report.json` in the downloaded data folder.
+Then you can check the output of this in the `runs` directory.

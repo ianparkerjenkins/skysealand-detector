@@ -2,12 +2,16 @@
 A utility script for training a simple, baseline YOLO model on the dataset.
 """
 
-# I'm pretty sure this works, not sure why pyright is not happy.
+import logging
 import random
 
 import numpy as np
 import torch
+
+# I'm pretty sure this works, not sure why pyright is not happy.
 from ultralytics import YOLO  # pyright: ignore [reportPrivateImportUsage]
+
+logger = logging.getLogger(__name__)
 
 
 def train():
@@ -17,14 +21,14 @@ def train():
     # Set a fixed seed for reproducability.
     seed = 42
     torch.manual_seed(seed)
-    np.random.seed(seed)
+    np.random.Generator(seed)
     random.seed(seed)
     torch.cuda.manual_seed_all(seed)
 
     # Train the model
     model.train(
         data="data/data.yaml",  # adjust to your dataset YAML
-        epochs=1,  # ~20–30 epochs
+        epochs=1,  # ~20-30 epochs
         imgsz=640,  # input size
         batch=16,  # adjust for Colab GPU memory
         workers=2,  # number of data loader workers
@@ -35,9 +39,9 @@ def train():
     # Evaluate on validation set
     metrics = model.val()
 
-    print("mAP@0.5:", metrics.box.map50)
-    print("Per-class precision:", metrics.box.prec)
-    print("Per-class recall:", metrics.box.rec)
+    logger.info("mAP@0.5:, %s", metrics.box.map50)
+    logger.info("Per-class precision: %s", metrics.box.prec)
+    logger.info("Per-class recall: %s", metrics.box.rec)
 
 
 if __name__ == "__main__":

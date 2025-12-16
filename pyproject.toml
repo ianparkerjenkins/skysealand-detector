@@ -40,3 +40,7 @@ select = [
 
 [tool.ruff.format]
 docstring-code-format = true
+
+
+[project.scripts]
+skysealand = "skysealand.cli:app"
