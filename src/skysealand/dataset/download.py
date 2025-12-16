@@ -1,4 +1,9 @@
-import os
+"""
+Downloads the relevant SkySeaLand dataset if it's not already present.
+
+If this is run and the dataset already exists, then the data will not be redownloaded.
+"""
+
 import zipfile
 import urllib.request
 from pathlib import Path
