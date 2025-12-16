@@ -1,0 +1,42 @@
+[project]
+name = "skysealand"
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.12"
+
+
+[tool.setuptools.dynamic]
+version = {file = "VERSION.txt"}
+
+
+[tool.ruff]
+line-length = 100
+force-exclude = true
+
+
+[tool.ruff.lint]
+select = [
+    "T",  # print() statements.
+    "W", "E",  # pycodestyle.
+    "F",  # PyFlakes
+    "B",  # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "I",  # isort
+    "PL",  # pylint
+    "NPY",  # numpy
+    "LOG",
+    "G",
+    "RUF",
+    "INP",
+    "ICN",
+    "PIE",
+    "FLY",
+    "ISC",
+    "INT",
+    "PTH",
+    "A",
+]
+
+
+[tool.ruff.format]
+docstring-code-format = true

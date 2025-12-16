@@ -13,33 +13,24 @@ Navigate into the repository
 cd skysealand-detector
 ```
 
-TODO: Use dev environment yml file
-
+Create the conda environment.
 ```
-conda create -n skysealand
+mambda env create -f dev_environment.yml
 ```
 
+TODO: How to update?
+
+Activate the new environment.
 ```
 conda activate skysealand
 ```
 
+Run the `devinstall.py` script.
 ```
-conda install matplotlib pyyaml pytorch
-```
-
-For YOLO baseline
-```
-conda install -c conda-forge ultralytics
+python devinstall.py
 ```
 
-Install pytorch and torchvision.
-
-(Use CPU only if no access to GPU)
-```
-conda install pytorch torchvision cpuonly -c pytorch
-```
-
-Launch VSCode
+Launch VSCode.
 ```
 code .
 ```

@@ -1,0 +1,31 @@
+default_install_hook_types: [pre-commit]
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: Ruff lint
+        description: "Python Linting"
+        entry: ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        args: []
+      - id: ruff-format
+        name: Ruff Format
+        description: "Python Formatting"
+        entry: ruff format
+        language: system
+        types_or: [python, pyi]
+        args: []
+
+  # Pre-commit standard hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace       # Trim trailing whitespace
+      - id: end-of-file-fixer         # Ensure files end with a newline
+      - id: check-yaml                # Validate YAML files
+      - id: check-json                # Validate JSON files
+      - id: check-added-large-files   # Prevent committing large files accidentally
+      - id: check-merge-conflict      # Detect unresolved merge conflicts
+      - id: mixed-line-ending         # Ensure consistent line endings
+      - id: check-toml                # Validate TOML files

@@ -1,0 +1,22 @@
+name: skysealand
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.12
+  - isort
+  - pyyaml
+  - toml
+  - numpy
+  - pandas
+  - pytorch
+  - torchvision
+  - matplotlib
+  - ultralytics  # For YOLO baseline.
+
+  # Development
+  - pre-commit
+  - mypy
+  - ruff
+  - pytest
+  - pyright
