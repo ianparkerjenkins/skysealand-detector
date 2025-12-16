@@ -20,3 +20,4 @@ dependencies:
   - ruff
   - pytest
   - pyright
+  - types-PyYAML  # mypy.
