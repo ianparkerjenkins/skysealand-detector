@@ -15,40 +15,41 @@ jobs:
         python-version: [3.12]
 
     steps:
-      # 1. Checkout the repo
+      # Checkout the repo.
       - uses: actions/checkout@v3
 
-      # 2. Set up Conda
+      # Set up Conda.
       - name: Set up Conda
         uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python-version }}
           auto-activate-base: false
 
-      # 3. Create and activate environment
+      # Create and activate environment.
       - name: Create environment
         run: |
+          conda install -c conda-forge mamba
           mamba env create -f dev_environment.yml
           conda activate skysealand
 
-      # 4. Run devinstall.py to finish setup
+      # Run devinstall.py to finish setup.
       - name: Dev install
         run: |
           conda activate skysealand
           python devinstall.py
 
-      # 4. Run pre-commit checks on all files
+      # Run pre-commit checks on all files.
       - name: Run pre-commit
         run: pre-commit run --all-files
 
-      # 5. Run MyPy type checks
+      # Run MyPy type checks.
       - name: Run MyPy
         run: mypy .
 
-      # 6. Run Pyright type checks
+      # Run Pyright type checks.
       - name: Run Pyright
         run: pyright
 
-      # 7. Run Pytest
+      # Run Pytest.
       - name: Run Pytest
         run: pytest --maxfail=5 --disable-warnings -q
