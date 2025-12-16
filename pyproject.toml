@@ -16,7 +16,7 @@ force-exclude = true
 
 [tool.ruff.lint]
 select = [
-    "T",  # print() statements.
+    "T",  # print statements.
     "W", "E",  # pycodestyle.
     "F",  # PyFlakes
     "B",  # flake8-bugbear
@@ -36,11 +36,14 @@ select = [
     "PTH",
     "A",
 ]
-
+ignore = ["E501"]
 
 [tool.ruff.format]
 docstring-code-format = true
+docstring-code-line-length = 100
 
+[tool.ruff.lint.per-file-ignores]
+"{test}/*" = ["INP"]
 
 [project.scripts]
 skysealand = "skysealand.cli:app"
