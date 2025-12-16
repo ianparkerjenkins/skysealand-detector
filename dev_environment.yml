@@ -22,3 +22,4 @@ dependencies:
   - pytest
   - pyright
   - types-PyYAML  # mypy.
+  - types-pillow  # mypy.

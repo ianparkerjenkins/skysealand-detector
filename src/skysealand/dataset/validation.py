@@ -2,17 +2,17 @@ import json
 import logging
 import pathlib
 
-import PIL
 import yaml
+from PIL import Image
 
 logger = logging.getLogger(__name__)
 
 
 def validate_image(image_path):
     try:
-        with PIL.Image.open(image_path) as img:
+        with Image.open(image_path) as img:
             img.verify()
-        with PIL.Image.open(image_path) as img:
+        with Image.open(image_path) as img:
             width, height = img.size
         return True, width, height, None
     except Exception as e:

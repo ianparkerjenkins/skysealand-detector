@@ -7,8 +7,6 @@ import random
 
 import numpy as np
 import torch
-
-# I'm pretty sure this works, not sure why pyright is not happy.
 from ultralytics import YOLO  # pyright: ignore [reportPrivateImportUsage]
 
 logger = logging.getLogger(__name__)
@@ -21,7 +19,7 @@ def train():
     # Set a fixed seed for reproducability.
     seed = 42
     torch.manual_seed(seed)
-    np.random.Generator(seed)
+    np.random.default_rng(seed)
     random.seed(seed)
     torch.cuda.manual_seed_all(seed)
 
