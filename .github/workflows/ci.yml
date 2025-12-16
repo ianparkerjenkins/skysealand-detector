@@ -30,6 +30,7 @@ jobs:
         run: |
           conda install -c conda-forge mamba
           mamba env create -f dev_environment.yml
+          conda init
           conda activate skysealand
 
       # Run devinstall.py to finish setup.
