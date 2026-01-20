@@ -1,10 +1,12 @@
 import logging
 import pathlib
-from typing import Iterable, TypedDict
+from typing import TypedDict
 
 import cv2
 import numpy as np
-from ultralytics import YOLO  # TODO: Decouple from ultralytics here?
+
+# TODO: Decouple from ultralytics here?
+from ultralytics import YOLO  # pyright: ignore [reportPrivateImportUsage]
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,7 @@ def load_ultralytics_yolo_model(model_path: pathlib.Path, device: str = "cpu") -
     return model
 
 
-def load_images(paths: Iterable[pathlib.Path]) -> tuple[list[np.ndarray], list[str]]:
+def load_images(*paths: pathlib.Path) -> tuple[list[np.ndarray], list[str]]:
     """
     Loads all of the given image paths into numpy arrays.
 
@@ -39,14 +41,14 @@ def load_images(paths: Iterable[pathlib.Path]) -> tuple[list[np.ndarray], list[s
         they came from for all of the images that were successfully loaded.
     """
     logger.info("Loading %s images ...", len(paths))
-    images = []
-    names = []
+    images, names = [], []
     for p in paths:
         img = cv2.imread(str(p))
         if img is None:
             logger.warning(
                 "Unable to load image for %s - no inference will be performed on this image.", p
             )
+            continue
         images.append(img)
         names.append(p.name)
     logger.info("Successfully loaded %s images.", len(images))

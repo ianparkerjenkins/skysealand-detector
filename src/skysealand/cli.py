@@ -5,6 +5,7 @@ The command line interface for the project.
 import json
 import logging
 import pathlib
+from typing import TypedDict
 
 import typer
 
@@ -39,6 +40,11 @@ def train():
     logger.info("Done with training!")
 
 
+class InferenceJsonOutput(TypedDict):
+    filename: str
+    inference: list[inference.Detection]
+
+
 @app.command()
 def infer(images: list[str], model_path: str = "yolov8n.pt", output_path: str = "inference.json"):
     """
@@ -46,6 +52,7 @@ def infer(images: list[str], model_path: str = "yolov8n.pt", output_path: str = 
 
     Writes the result to the specified ``output_path`` location as a json file.
     This file has the structure of ``{'filename': ..., 'inference': ...}``.
+    See ``inference.Detection`` for more details.
 
     Args:
         images: A list of the image paths to perform inference on.
@@ -55,17 +62,16 @@ def infer(images: list[str], model_path: str = "yolov8n.pt", output_path: str = 
     """
     logging_setup.setup_logging()
 
-    image_arrays, names = inference.load_images([pathlib.Path(img) for img in images])
+    image_arrays, names = inference.load_images(*(pathlib.Path(img) for img in images))
 
-    model = inference.load_ultralytics_yolo_model(model_path)
+    model = inference.load_ultralytics_yolo_model(pathlib.Path(model_path))
     outputs = inference.process_ultralytics_yolo_batched_detections(model(image_arrays))
 
-    to_write: dict[str, list[list[inference.Detection]]] = {}
+    to_write: list[InferenceJsonOutput] = []
     for name, output in zip(names, outputs, strict=True):
-        to_write["filename"] = name
-        to_write["inference"] = output
+        to_write.append({"filename": name, "inference": output})
 
     logger.info("Writing output file @ %s ...", output_path)
-    with pathlib.Path.open(output_path, "w") as write_file:
+    with pathlib.Path(output_path).open("w") as write_file:
         json.dump(to_write, write_file)
     logger.info("Done with inference!")
