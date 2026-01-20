@@ -26,7 +26,7 @@ def train():
     # Train the model
     model.train(
         data="data/data.yaml",  # adjust to your dataset YAML
-        epochs=1,  # ~20-30 epochs
+        epochs=25,  # ~20-30 epochs
         imgsz=640,  # input size
         batch=16,  # adjust for Colab GPU memory
         workers=2,  # number of data loader workers
@@ -40,7 +40,3 @@ def train():
     logger.info("mAP@0.5:, %s", metrics.box.map50)
     logger.info("Per-class precision: %s", metrics.box.prec)
     logger.info("Per-class recall: %s", metrics.box.rec)
-
-
-if __name__ == "__main__":
-    train()
