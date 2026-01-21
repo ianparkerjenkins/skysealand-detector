@@ -73,48 +73,54 @@ By default this uses the model that is output from running `skysealand train`, c
 
 The CLI inference writes the output into a json file with the following structure:
 ```json
-[
-    {
-        "filename": "path/to/my/img1.jpg",
-        "inference": [
-            {
-                "class_id": 2,
-                "confidence": 0.46020451188087463,
-                "bbox": [
-                    651.6776733398438,
-                    542.8021850585938,
-                    739.9046630859375,
-                    610.9060668945312
-                ]
-            },
-            {
-                "class_id": 0,
-                "confidence": 0.30361688137054443,
-                "bbox": [
-                    600.8245849609375,
-                    517.4049072265625,
-                    685.6116333007812,
-                    587.8324584960938
-                ]
-            }
-        ]
-    },
-    {
-        "filename": "path/to/my/img2.jpg",
-        "inference": [
-            {
-                "class_id": 13,
-                "confidence": 0.2531780004501343,
-                "bbox": [
-                    0.0,
-                    0.0,
-                    245.4083251953125,
-                    191.41256713867188
-                ]
-            }
-        ]
+{
+    "results": [
+        {
+            "filename": "path/to/my/img1.jpg",
+            "inference": [
+                {
+                    "class_id": 2,
+                    "confidence": 0.4285559058189392,
+                    "bbox": [
+                        1028.7703857421875,
+                        417.98046875,
+                        1210.3580322265625,
+                        538.3756713867188
+                    ]
+                },
+                {
+                    "class_id": 0,
+                    "confidence": 0.4281531572341919,
+                    "bbox": [
+                        1192.9344482421875,
+                        555.4136352539062,
+                        1224.4884033203125,
+                        627.125732421875
+                    ]
+                }
+            ]
+        },
+        {
+            "filename": "path/to/my/img2.jpg",
+            "inference": [
+                {
+                    "class_id": 13,
+                    "confidence": 0.5388724207878113,
+                    "bbox": [
+                        0.2129051238298416,
+                        0.0,
+                        245.41836547851562,
+                        193.52255249023438
+                    ]
+                }
+            ]
+        }
+    ],
+    "metrics": {
+        "num_images": 2,
+        "inference_time_sec": 0.28876129999844125
     }
-]
+}
 ```
 
 By default this file is called `inference.json`, but you can change this with `--output_path`.
