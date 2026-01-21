@@ -36,7 +36,7 @@ select = [
     "PTH",
     "A",
 ]
-ignore = ["E501", "PLR2004"]
+ignore = ["E501", "PLR2004", "B008"]
 
 [tool.ruff.format]
 docstring-code-format = true

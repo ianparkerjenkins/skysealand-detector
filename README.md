@@ -79,13 +79,23 @@ The CLI inference writes the output into a json file with the following structur
         "inference": [
             {
                 "class_id": 2,
-                "confidence": 0.46,
-                "bbox": [651.68, 542.80, 739.90, 610.91]
+                "confidence": 0.46020451188087463,
+                "bbox": [
+                    651.6776733398438,
+                    542.8021850585938,
+                    739.9046630859375,
+                    610.9060668945312
+                ]
             },
             {
                 "class_id": 0,
-                "confidence": 0.45,
-                "bbox": [869.62, 630.69, 942.32, 694.64]
+                "confidence": 0.30361688137054443,
+                "bbox": [
+                    600.8245849609375,
+                    517.4049072265625,
+                    685.6116333007812,
+                    587.8324584960938
+                ]
             }
         ]
     },
@@ -94,8 +104,13 @@ The CLI inference writes the output into a json file with the following structur
         "inference": [
             {
                 "class_id": 13,
-                "confidence": 0.25,
-                "bbox": [0.0, 0.0, 245.41, 191.41]
+                "confidence": 0.2531780004501343,
+                "bbox": [
+                    0.0,
+                    0.0,
+                    245.4083251953125,
+                    191.41256713867188
+                ]
             }
         ]
     }
@@ -105,3 +120,9 @@ The CLI inference writes the output into a json file with the following structur
 By default this file is called `inference.json`, but you can change this with `--output_path`.
 
 In the event that an image cannot be loaded a warning will be logged and inference will be skipped for that image.
+
+If you want to analyze all of the images in a particular directory, then you can use the `--images-dir` option:
+
+```
+skysealand infer --images-dir path/to/all/my/images/
+```
