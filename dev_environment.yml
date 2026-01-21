@@ -6,6 +6,7 @@ dependencies:
   - python=3.12
   - isort
   - pyyaml
+  - fastapi
   - toml
   - numpy
   - pandas

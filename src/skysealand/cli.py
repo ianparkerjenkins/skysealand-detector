@@ -5,7 +5,6 @@ The command line interface for the project.
 import json
 import logging
 import pathlib
-from typing import TypedDict
 
 import typer
 
@@ -40,20 +39,12 @@ def train():
     logger.info("Done with training!")
 
 
-class InferenceJsonOutput(TypedDict):
-    filename: str
-    inference: list[inference.Detection]
-
-
-_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".webp"}
-
-
 def _get_image_paths_from_directory(images_dir: str) -> list[pathlib.Path]:
     dir_path = pathlib.Path(images_dir)
     if not dir_path.is_dir():
         raise ValueError(f"{images_dir} is not a directory")
 
-    image_paths = sorted(p for p in dir_path.iterdir() if p.suffix.lower() in _IMAGE_EXTENSIONS)
+    image_paths = sorted(p for p in dir_path.iterdir())
     return image_paths
 
 
@@ -70,6 +61,7 @@ def infer(
     ),
     model_path: str = "yolov8n.pt",
     output_path: str = "inference.json",
+    skip_image_errors: bool = True,
 ):
     """
     Run inference on a batch of image paths.
@@ -84,14 +76,12 @@ def infer(
         model_path: The path to the model to use for inference. Defaults to "yolov8n.pt"
             (The result of performing the default training).
         output_path: The path to the output file to write. Defaults to "inference.json"
+        skip_image_errors: Whether to skip errors with loading images or not. Defaults to true.
     """
     logging_setup.setup_logging()
 
-    if images is None and images_dir is None:
-        raise ValueError("You must provide either `images` or `images_dir`.")
-
-    if images is not None and images_dir is not None:
-        raise ValueError("Provide only one of `images` or `images_dir`, not both.")
+    if (images is None) == (images_dir is None):
+        raise ValueError("Either `images` or `images_dir` must be provided (not both or neither).")
 
     image_paths = (
         [pathlib.Path(img) for img in images]
@@ -101,15 +91,12 @@ def infer(
     if not image_paths:
         raise ValueError("No images found to process.")
 
-    image_arrays, names = inference.load_images(*image_paths)
-
-    model = inference.load_ultralytics_yolo_model(pathlib.Path(model_path))
-    logger.info("Running inference. This may take a minute ...")
-    outputs = inference.process_ultralytics_yolo_batched_detections(model(image_arrays))
-
-    to_write: list[InferenceJsonOutput] = []
-    for name, output in zip(names, outputs, strict=True):
-        to_write.append({"filename": name, "inference": output})
+    image_arrays, names = inference.load_images(*image_paths, skip_errors=skip_image_errors)
+    to_write = inference.run_model_with_timing(
+        inference.load_ultralytics_yolo_model(pathlib.Path(model_path)),
+        image_arrays,
+        names,
+    )
 
     logger.info("Writing output file @ %s ...", output_path)
     with pathlib.Path(output_path).open("w") as write_file:
