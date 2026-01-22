@@ -132,3 +132,15 @@ If you want to analyze all of the images in a particular directory, then you can
 ```
 skysealand infer --images-dir path/to/all/my/images/
 ```
+
+
+## Using the Front-End Web UI
+
+To use the browser to upload images and perform infereneces on them, first launch the FastAPI app from the root of the repository:
+```
+uvicorn skysealand.api:app --reload
+```
+
+Then in the browser navigate to `http://127.0.0.1:8000/`.
+
+You should be able to upload images to run inference on from there!
