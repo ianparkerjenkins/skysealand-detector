@@ -2,13 +2,13 @@ import logging
 import pathlib
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.staticfiles import StaticFiles
 
 from skysealand import inference, logging_setup
 
 app = FastAPI()
 logging_setup.setup_logging()
 logger = logging.getLogger(__name__)
-
 
 # TODO: Make this a config setting.
 MODEL_PATH = pathlib.Path("yolov8n.pt")
@@ -29,7 +29,7 @@ def _get_model():
 
 @app.post("/infer")
 async def infer_endpoint(
-    files: list[UploadFile] = File(..., description="One or more image files"),
+    files: list[UploadFile] = File(...),
 ) -> inference.InferenceJsonOutput:
     logger.info("Received inference request with %d file(s)", len(files))
 
@@ -50,3 +50,6 @@ async def infer_endpoint(
             status_code=500,
             detail="Internal inference error",
         ) from None
+
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")

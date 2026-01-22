@@ -1,0 +1,23 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+#dropArea {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+#dropArea.hover {
+  border-color: #666;
+  background-color: #f0f0f0;
+}
+
+canvas {
+  border: 1px solid #ccc;
+  margin: 10px 0;
+  max-width: 100%;
+}
