@@ -52,4 +52,4 @@ async def infer_endpoint(
         ) from None
 
 
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
