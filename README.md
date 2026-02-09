@@ -1,6 +1,6 @@
 # SkySeaLand Detector
 
-![](screenshot.png)
+![](screenshot.jpg)
 
 ## Developer Install
 
