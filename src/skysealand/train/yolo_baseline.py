@@ -38,5 +38,5 @@ def train():
     metrics = model.val()
 
     logger.info("mAP@0.5:, %s", metrics.box.map50)
-    logger.info("Per-class precision: %s", metrics.box.prec)
-    logger.info("Per-class recall: %s", metrics.box.rec)
+    logger.info("Per-class precision: %s", metrics.box.p)
+    logger.info("Per-class recall: %s", metrics.box.r)
