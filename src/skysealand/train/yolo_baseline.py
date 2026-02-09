@@ -25,13 +25,13 @@ def train():
 
     # Train the model
     model.train(
-        data="data/data.yaml",  # adjust to your dataset YAML
-        epochs=25,  # ~20-30 epochs
-        imgsz=640,  # input size
-        batch=16,  # adjust for Colab GPU memory
-        workers=2,  # number of data loader workers
-        seed=42,  # fixed seed
-        pretrained=True,  # use transfer learning
+        data="data/data.yaml",
+        epochs=25,
+        imgsz=640,
+        batch=16,
+        workers=2,
+        seed=seed,
+        pretrained=True,
     )
 
     # Evaluate on validation set

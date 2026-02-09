@@ -73,34 +73,64 @@ uploadBtn.addEventListener("click", async () => {
   drawBatchDetections(data.results, selectedFiles);
 });
 
-function drawBatchDetections(results, files) {
-  canvasContainer.innerHTML = ""; // clear previous canvases
 
+const CLASS_NAMES = {
+  0: "airplane",
+  1: "boat",
+  2: "car",
+  3: "ship"
+};
+
+
+function colorForClass(classId) {
+  const hue = (classId * 137.508) % 360; // golden angle
+  return `hsl(${hue}, 85%, 50%)`;
+}
+
+
+function drawBatchDetections(results, files) {
+  canvasContainer.innerHTML = "";
   results.forEach(item => {
     const file = files.find(f => f.name === item.filename);
     if (!file) return;
 
     const canvas = document.createElement("canvas");
     canvasContainer.appendChild(canvas);
-
     const ctx = canvas.getContext("2d");
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       const img = new Image();
-      img.onload = function() {
+      img.onload = function () {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
 
         ctx.lineWidth = 2;
         ctx.font = "16px Arial";
-        ctx.fillStyle = "red";
-        ctx.strokeStyle = "red";
 
         item.inference.forEach(det => {
           const [x1, y1, x2, y2] = det.bbox;
+
+          const classId = det.class_id;
+          const className = CLASS_NAMES[classId] ?? `class_${classId}`;
+          const color = colorForClass(classId);
+          console.log(className, color)
+
+          // box
+          ctx.strokeStyle = color;
           ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-          ctx.fillText(`${det.class_id}: ${det.confidence.toFixed(2)}`, x1, y1 - 5);
+
+          // label background
+          const label = `${className} ${det.confidence.toFixed(2)}`;
+          const textWidth = ctx.measureText(label).width;
+          const textHeight = 16;
+
+          ctx.fillStyle = color;
+          ctx.fillRect(x1, y1 - textHeight - 4, textWidth + 6, textHeight + 4);
+
+          // label text
+          ctx.fillStyle = "white";
+          ctx.fillText(label, x1 + 3, y1 - 6);
         });
       };
       img.src = e.target.result;
