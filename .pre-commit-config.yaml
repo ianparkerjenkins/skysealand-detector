@@ -26,7 +26,7 @@ repos:
       - id: check-yaml                # Validate YAML files
       - id: check-json                # Validate JSON files
       - id: check-added-large-files   # Prevent committing large files accidentally
-        args: ["--maxkb=2048"]
+        args: ["--maxkb=5000"]
       - id: check-merge-conflict      # Detect unresolved merge conflicts
       - id: mixed-line-ending         # Ensure consistent line endings
       - id: check-toml                # Validate TOML files
